@@ -1,3 +1,4 @@
+import { getAllByTestId } from '@testing-library/dom'
 import React, { useEffect, useState } from 'react'
 
 const Timer = ({ pomodoroLength, breakLength }) => {
@@ -33,6 +34,7 @@ const Timer = ({ pomodoroLength, breakLength }) => {
                     setIsBreak(true)
                     changeTimeValues(breakLength, 0)
                 } else {
+                    alert('GET BACK TO WORK YOU FUCKING MAGGOT!!')
                     setIsBreak(false)
                     changeTimeValues(pomodoroLength)
                 }
