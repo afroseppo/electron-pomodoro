@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const Timer = ({ pomodoroLength }) => {
 
@@ -8,31 +8,42 @@ const Timer = ({ pomodoroLength }) => {
         cycles: 0
     }
 
-    console.log(pomodoroLength)
-
     const [pomodoroState, setPomodoroState] = useState(initialValues)
     const [isRunning, setIsRunning] = useState(false)
+
+    useEffect(() => {
+        let interval = null
+
+        if (isRunning) {
+            interval = setInterval(() => {
+                const minutes = (pomodoroState.seconds === 0 && pomodoroState.minutes > 0)
+                ? pomodoroState.minutes - 1
+                : pomodoroState.minutes
+            const seconds = pomodoroState.seconds > 0
+                ? pomodoroState.seconds - 1
+                : 59
+            changeTimeValues(minutes, seconds)
+            }, 1000)
+        } else if (!isRunning && (pomodoroState.minutes !== 0 || pomodoroState.seconds !== 0)) {
+            clearInterval(interval)
+        }
+
+        return () => clearInterval(interval)
+    }, [isRunning, pomodoroState])
 
     const handleStartClick = (e) => {
         e.preventDefault()
         setIsRunning(true)
-        console.log('Start')
-        setInterval(() => {
-            countdown()
-        }, 1000)
     }
 
     const handlePauseClick = (e) => {
         e.preventDefault()
         setIsRunning(false)
-        console.log('Pause')
-        clearInterval()
     }
 
     const handleResetClick = (e) => {
         e.preventDefault()
         setPomodoroState(initialValues)
-        console.log('Reset')
     }
 
     const changeTimeValues = (minutes, seconds) => {
@@ -50,25 +61,14 @@ const Timer = ({ pomodoroLength }) => {
         return `${mins}:${secs}`
     }
 
-    const countdown = () => {
-        if (isRunning) {
-            const minutes = (pomodoroState.seconds === 0 && pomodoroState.minutes > 0) 
-                ? pomodoroState.minutes - 1 
-                : pomodoroState.minutes
-            const seconds = pomodoroState.seconds > 0 
-                ? pomodoroState.seconds - 1 
-                : 60
 
-            changeTimeValues(minutes, seconds)
-        }
-    }
 
-    return(
+    return (
         <div>
             <h2>{timerString()}</h2>
-            <button onClick = {handleStartClick}>Start</button>
-            <button onClick = {handlePauseClick}>Pause</button>
-            <button onClick = {handleResetClick}>Reset</button>
+            <button onClick={handleStartClick}>Start</button>
+            <button onClick={handlePauseClick}>Pause</button>
+            <button onClick={handleResetClick}>Reset</button>
             <p>Cycles: {pomodoroState.cycles}</p>
         </div>
     )
